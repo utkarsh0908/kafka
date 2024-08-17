@@ -1,21 +1,24 @@
-import kafka from './client.js';
+import kafka from "./client.js";
+// Create a producer instance
+const producer = kafka.producer();
 
-async function init() {
-  const producer = kafka.producer();
-
-  console.log('Connecting producer to Kafka');
+const run = async () => {
+  // Connect the producer to Kafka
   await producer.connect();
-  console.log('Connected producer to Kafka');
+  console.log('Kafka Producer connected successfully.');
 
-  await producer.send({
-    topic: 'testing',
+  // Send a message to the Kafka topic
+  const result = await producer.send({
+    topic: 'test-topic', // Replace with your Kafka topic
     messages: [
-      { key: 'location-update', value: JSON.stringify({ name: 'Tony Stark', loc: 'Hyderabad' }) },
-      { key: 'location-update', value: JSON.stringify({ name: 'Utkarsh', loc: 'Hyderabad' }) }
-    ]
-  })
+      { key: '1', value: JSON.stringify({ name: 'Tony Stark', loc: 'Hyderabad' }) }, // Replace with your message(s)
+    ],
+  });
 
+  console.log('Message sent successfully:', result);
+
+  // Disconnect the producer after sending the message
   await producer.disconnect();
-}
+};
 
-init();
+run().catch(console.error);

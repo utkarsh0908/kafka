@@ -1,28 +1,27 @@
 import kafka from "./client.js";
 
-async function init() {
-  const consumer = kafka.consumer({groupId: 'test-group'});
+// Create a consumer instance
+const consumer = kafka.consumer({ groupId: 'test-group' }); // Replace with your consumer group ID
 
-  console.log('Connecting consumer to Kafka');
+const run = async () => {
+  // Connect the consumer to Kafka
   await consumer.connect();
-  console.log('Connected consumer to Kafka');
+  console.log('Kafka Consumer connected successfully.');
 
-  await consumer.subscribe({ topics: ['testing'], fromBeginning: true });
+  // Subscribe to the topic
+  await consumer.subscribe({ topic: 'test-topic', fromBeginning: true }); // Replace with your Kafka topic
 
-  console.log('running messages');
+  // Run the consumer to listen for messages
   await consumer.run({
-    eachMessage: async ({ topic, partition, message, heartbeat, pause }) => {
+    eachMessage: async ({ topic, partition, message }) => {
       console.log({
-        key: message.key.toString(),
-        value: message.value.toString(),
-        headers: message.headers,
-      })
+        topic,
+        partition,
+        offset: message.offset,
+        value: message.value.toString(), // Message content
+      });
     },
-  })
-  console.log('fetched messages');
+  });
+};
 
-  console.log('Disconnecting consumer from Kafka');
-  await consumer.disconnect();
-}
-
-init();
+run().catch(console.error);
